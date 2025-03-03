@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { BookingDay } from "@/components/BoodingDay";
+import { BookingDay } from "@/components/BookingDay";
 
 // Initialize plugins
 dayjs.extend(weekday);
