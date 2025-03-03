@@ -19,6 +19,7 @@ export const saveToken = async (code: string) => {
   const { token } = await zoomOauthClient.getToken({
     code,
     redirect_uri: "http://localhost:5173/oauth-callback",
+    scope: ["meeting:write:meeting"],
   });
 
   localStorage.setItem(LOCAL_STORAGE_ZOOM_TOKEN, JSON.stringify(token));
@@ -46,6 +47,7 @@ export const createEvent = async ({
     method: "POST",
     headers: {
       Authorization: `Bearer ${token.token.access_token}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       start_time: startTime.toISOString(),
