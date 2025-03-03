@@ -52,7 +52,7 @@ export const createEvent = async ({
     body: JSON.stringify({
       start_time: startTime.toISOString(),
       duration: endTime.diff(startTime, "minutes"),
-      timezone: "Europe/Paris",
+      timezone: "UTC",
       topic: object,
       type: 2,
     }),
