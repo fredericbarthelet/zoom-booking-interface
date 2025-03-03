@@ -11,4 +11,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/zoom-oauth": {
+        target: "https://zoom.us/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace("/zoom-oauth", ""),
+      },
+      "/api": {
+        target: "https://api.zoom.us/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace("/api", ""),
+      },
+    },
+  },
 });

@@ -9,7 +9,9 @@ export const zoomOauthClient = new AuthorizationCode({
     secret: import.meta.env.VITE_ZOOM_CLIENT_SECRET,
   },
   auth: {
-    tokenHost: "https://zoom.us/oauth",
+    authorizeHost: "https://zoom.us",
+    tokenHost: "http://localhost:5173",
+    tokenPath: "/zoom-oauth/oauth/token",
   },
 });
 
@@ -20,45 +22,37 @@ export const saveToken = async (code: string) => {
   });
 
   localStorage.setItem(LOCAL_STORAGE_ZOOM_TOKEN, JSON.stringify(token));
+
+  return token.access_token;
 };
 
-export interface ZoomEvent {
-  topic: string;
-  start_time: string;
-  duration: number; // in minutes
-  timezone: string;
-}
-
-export class ZoomClient {
-  private apiKey: string;
-  private apiSecret: string;
-
-  constructor(apiKey: string, apiSecret: string) {
-    this.apiKey = apiKey;
-    this.apiSecret = apiSecret;
+export const createEvent = async ({
+  startTime,
+  endTime,
+  object,
+}: {
+  startTime: Dayjs;
+  endTime: Dayjs;
+  object: string;
+}) => {
+  const localStorageToken = localStorage.getItem(LOCAL_STORAGE_ZOOM_TOKEN);
+  if (!localStorageToken) {
+    throw new Error("Not connected to Zoom");
   }
 
-  async createEvent(
-    topic: string,
-    startTime: Dayjs,
-    endTime: Dayjs
-  ): Promise<ZoomEvent> {
-    // Calculate duration in minutes
-    const durationMinutes = endTime.diff(startTime, "minute");
+  const token = zoomOauthClient.createToken(JSON.parse(localStorageToken));
 
-    const event: ZoomEvent = {
-      topic,
+  await fetch("/api/v2/users/me/meetings", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token.token.access_token}`,
+    },
+    body: JSON.stringify({
       start_time: startTime.toISOString(),
-      duration: durationMinutes,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    };
-
-    // TODO: Implement actual Zoom API call here
-    // This would involve:
-    // 1. Getting an access token using apiKey and apiSecret
-    // 2. Making a POST request to Zoom meetings endpoint
-    // 3. Handling the response
-
-    return event;
-  }
-}
+      duration: endTime.diff(startTime, "minutes"),
+      timezone: "Europe/Paris",
+      topic: object,
+      type: 2,
+    }),
+  });
+};

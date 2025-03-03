@@ -4,7 +4,7 @@ export const ConnectPage = () => {
   const onConnect = () => {
     const authUrl = zoomOauthClient.authorizeURL({
       redirect_uri: "http://localhost:5173/oauth-callback",
-      scope: ["calendar:write:event"],
+      scope: ["meeting:write:meeting"],
     });
 
     window.location.href = authUrl;

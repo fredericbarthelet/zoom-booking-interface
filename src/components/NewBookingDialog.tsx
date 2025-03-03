@@ -22,6 +22,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDisclosure } from "@/hooks/useDisclosure";
+import { useMutation } from "@tanstack/react-query";
+import { createEvent } from "@/services/zoom";
+import { toast } from "sonner";
 
 type NewBookingDialogProps = {
   startTime: Dayjs;
@@ -29,7 +32,10 @@ type NewBookingDialogProps = {
 } & Omit<ReturnType<typeof useDisclosure>, "onOpen">;
 
 const newBookingSchema = z.object({
-  object: z.string().min(1, "Please enter a name for your event"),
+  object: z
+    .string()
+    .min(1, "Please enter a name for your event")
+    .max(200, "Please use a shorter event title"),
 });
 
 type NewBookingFormSchema = z.infer<typeof newBookingSchema>;
@@ -41,6 +47,9 @@ export const NewBookingDialog: FunctionComponent<NewBookingDialogProps> = ({
   onClose,
   onToggle,
 }) => {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createEvent,
+  });
   const form = useForm<NewBookingFormSchema>({
     resolver: zodResolver(newBookingSchema),
     defaultValues: {
@@ -49,8 +58,14 @@ export const NewBookingDialog: FunctionComponent<NewBookingDialogProps> = ({
     shouldUnregister: true,
   });
 
-  const onSubmit = (data: NewBookingFormSchema) => {
-    console.log(data);
+  const onSubmit = async (data: NewBookingFormSchema) => {
+    await mutateAsync({
+      startTime,
+      endTime,
+      object: data.object,
+    });
+    toast.success("Event created successfully");
+    onClose();
   };
 
   return (
@@ -103,7 +118,13 @@ export const NewBookingDialog: FunctionComponent<NewBookingDialogProps> = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white-900" />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
             </div>
           </form>
         </Form>
