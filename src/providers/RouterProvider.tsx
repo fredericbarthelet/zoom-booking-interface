@@ -4,6 +4,8 @@ import {
 } from "react-router-dom";
 import App from "../App";
 import { BookingPage } from "@/pages/booking";
+import { OAuthCallbackPage } from "@/pages/oauth-callback";
+import { ConnectPage } from "@/pages/connect";
 
 const router = createBrowserRouter([
   {
@@ -11,8 +13,16 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
+        index: true,
+        element: <ConnectPage />,
+      },
+      {
         path: "/booking",
         element: <BookingPage />,
+      },
+      {
+        path: "/oauth-callback",
+        element: <OAuthCallbackPage />,
       },
     ],
   },
