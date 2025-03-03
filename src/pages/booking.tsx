@@ -13,13 +13,14 @@ export const BookingPage = () => {
       <h1 className="text-2xl font-bold mb-4">Book a zoom call</h1>
 
       <div className="grid grid-cols-8">
-        <div className="text-center  border-r">
-          <div className="h-16"></div>
-          {Array.from({ length: 12 }, (_, i) => (
-            <div key={`time-${i}`} className="p-4">
-              <div className="text-center">
-                {dayjs().hour(9).minute(0).add(i, "hour").format("hh:mm A")}
-              </div>
+        <div className="text-center border-r">
+          <div className="h-16 border-b"></div>
+          {Array.from({ length: 10 }, (_, i) => (
+            <div
+              key={`time-${i}`}
+              className="text-start justify-start h-16 border-b"
+            >
+              {dayjs().hour(9).minute(0).add(i, "hour").format("hh:mm A")}
             </div>
           ))}
         </div>
